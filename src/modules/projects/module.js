@@ -1,8 +1,25 @@
-const express = require('express');
-const router = express.Router();
+const { Router } = require('express');
+const mAuthenticatesUser = require('../users/middlewares/authenticates-user');
 
-router.get('/', (req, res) => {
-  res.send('hi projects');
-});
+class ProjectsModule {
+  constructor(app) {
+    this.app = app;
+  }
 
-module.exports = { prefix: '/projects', router };
+  mount() {
+    this.router = Router();
+    this.router.use(mAuthenticatesUser);
+
+    // @todo
+    this.router.get('/', (req, res) => {
+      res.send({
+        message: 'hi projects',
+        user: req.user,
+      });
+    });
+
+    this.app.use('/projects', this.router);
+  }
+}
+
+module.exports = ProjectsModule;

@@ -1,8 +1,20 @@
-const express = require('express');
-const router = express.Router();
+const { Router } = require('express');
+const db = require('./services/db');
+const aCreate = require('./actions/create');
+const aLogin = require('./actions/login');
 
-router.get('/', (req, res) => {
-  res.send('hi users');
-});
+class UsersModule {
+  constructor(app) {
+    this.app = app;
+  }
 
-module.exports = { prefix: '/users', router };
+  async mount() {
+    await db.connect();
+    this.router = Router();
+    this.router.post('/', aCreate);
+    this.router.post('/login', aLogin);
+    this.app.use('/users', this.router);
+  }
+}
+
+module.exports = UsersModule;
